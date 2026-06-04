@@ -1,15 +1,23 @@
-#gui
 import pygame
 import lifelike_logica as lif
+import easygui
 
-tam = 10
-filas = 50
-columnas = 50
 tick = 10
 
 def main():
     pygame.init()
     clock = pygame.time.Clock()
+    filas = int(easygui.enterbox("Cantidad de filas"))
+    columnas = int(easygui.enterbox("Cantidad de columnas"))
+    tam = int(easygui.enterbox("Tamaño de las celdas"))
+    texto = easygui.enterbox("Regla de nacimiento (B)")
+    nacimiento = []
+    for digito in texto:
+        nacimiento.append(int(digito))
+    texto = easygui.enterbox("Regla de supervivencia (S)")
+    supervivencia = []
+    for digito in texto:
+        supervivencia.append(int(digito))
     M = lif.generar_matriz(filas, columnas)
     w, h = columnas * tam, filas * tam
     window = pygame.display.set_mode((w, h))
@@ -21,12 +29,25 @@ def main():
                 loop = False
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_p]:
+                if keys[pygame.K_SPACE]:
                     pausa = not pausa
                 elif keys[pygame.K_r]:
-                    lif.reinicio_random(filas, columnas) #falta en logica
+                    M = lif.reinicio_random(filas, columnas)
                 elif keys[pygame.K_b]:
-                    lif.reinicio_neutro(filas, columnas) #falta en logica
+                    M = lif.reinicio_neutro(filas, columnas)
+                elif keys[pygame.K_g]:
+                    datos = {"M": M,"filas": filas,"columnas": columnas,"tam": tam,"nacimiento": nacimiento,"supervivencia": supervivencia}
+                    lif.guardar("partida.dat", datos)
+                elif keys[pygame.K_c]:
+                    datos = lif.cargar("partida.dat")
+                    M = datos["M"]
+                    filas = datos["filas"]
+                    columnas = datos["columnas"]
+                    tam = datos["tam"]
+                    nacimiento = datos["nacimiento"]
+                    supervivencia = datos["supervivencia"]
+                    w, h = columnas * tam, filas * tam
+                    window = pygame.display.set_mode((w, h))
             if event.type == pygame.MOUSEBUTTONDOWN:
                 buttons = pygame.mouse.get_pressed()
                 x, y = pygame.mouse.get_pos()
@@ -43,7 +64,7 @@ def main():
                     y = f * tam
                     pygame.draw.rect(window, (0, 255, 128), (x, y, tam, tam))
         if not pausa:
-            M = lif.transicion(M)
+            M = lif.transicion(M, nacimiento, supervivencia)
         pygame.display.update()
         clock.tick(10)
     pygame.quit()

@@ -1,5 +1,5 @@
-# logica
 from random import randint
+import pickle
 
 def reinicio_random(filas, columnas):
     return generar_matriz(filas, columnas)
@@ -24,24 +24,22 @@ def obtener_vecinos(M, f, c):
                 vecinos.append(M[filavecinos][columnavecinos])
     return vecinos
 
-def transicion_celula(estado, vecinos):
-    """Retorna el nuevo estado de la célula de acuerdo
-    al estado de sus vecinos.
-    Si estado == 0 y tiene 3 vecinos vivos --> viva
-    Si estado == 1 y tiene menos de 2 vecinos vivos --> muere
-    Si estado == 1 y tiene más de 3 vecinos vivos --> muere
-    Cualquier otra combinación, el estado sigue igual."""
-    if estado == 0 and (vecinos.count(1) == 3):
+def transicion_celula(estado, vecinos, nacimiento, supervivencia):
+
+    vivos = vecinos.count(1)
+
+    if estado == 0:
+        if vivos in nacimiento:
+            return 1
+        return 0
+
+    if vivos in supervivencia:
         return 1
-    elif estado == 1 and (vecinos.count(1) < 2):
-        return 0
-    elif estado == 1 and (vecinos.count(1) > 3):
-        return 0
-    else:
-        return estado
+
+    return 0
     
 
-def transicion(M):
+def transicion(M, nacimiento, supervivencia):
     """Toma a la matriz completa y le aplica la función de
     transición a cada célula con su propio vecindario y deja
     el resultado en una matriz nueva."""
@@ -54,3 +52,17 @@ def transicion(M):
             fila.append(estado2)
         matriz2.append(fila)
     return matriz2
+
+def guardar(nombre, datos):
+
+    archivo = open(nombre, "wb")
+    pickle.dump(datos, archivo)
+    archivo.close()
+
+def cargar(nombre):
+
+    archivo = open(nombre, "rb")
+    datos = pickle.load(archivo)
+    archivo.close()
+
+    return datos

@@ -1,5 +1,6 @@
+#gui
 import pygame
-import lifelike_logica as lif #con o snk
+import lifelike_logica as lif
 
 tam = 10
 filas = 50
@@ -9,7 +10,7 @@ tick = 10
 def main():
     pygame.init()
     clock = pygame.time.Clock()
-    M = con.generar_matriz(filas, columnas)
+    M = lif.generar_matriz(filas, columnas)
     w, h = columnas * tam, filas * tam
     window = pygame.display.set_mode((w, h))
     loop = True
@@ -23,9 +24,9 @@ def main():
                 if keys[pygame.K_p]:
                     pausa = not pausa
                 elif keys[pygame.K_r]:
-                    lif.reinicio_random() #falta en logica
+                    lif.reinicio_random(filas, columnas) #falta en logica
                 elif keys[pygame.K_b]:
-                    lif.reinicio_neutro() #falta en logica
+                    lif.reinicio_neutro(filas, columnas) #falta en logica
             if event.type == pygame.MOUSEBUTTONDOWN:
                 buttons = pygame.mouse.get_pressed()
                 x, y = pygame.mouse.get_pos()
@@ -42,7 +43,7 @@ def main():
                     y = f * tam
                     pygame.draw.rect(window, (0, 255, 128), (x, y, tam, tam))
         if not pausa:
-            M = con.transicion(M)
+            M = lif.transicion(M)
         pygame.display.update()
         clock.tick(10)
     pygame.quit()

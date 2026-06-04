@@ -1,8 +1,11 @@
+# logica
 from random import randint
 
-def reinicio_random():
+def reinicio_random(filas, columnas):
+    return generar_matriz(filas, columnas)
 
-def reinicio_neutro()
+def reinicio_neutro(filas, columnas):
+    return [[0 for c in range(columnas)] for f in range(filas)]
     
 def generar_matriz(filas, columnas):
     """Función que retorna una matriz de las dimensiones

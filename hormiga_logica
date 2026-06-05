@@ -54,3 +54,43 @@ def siguiente(M, hormiga, regla):
     hormiga["direccion"] = girar_hormiga(hormiga["direccion"], giro)
     M[f][c] = (M[f][c] + 1) % len(regla)
     avanzar_hormiga(hormiga, len(M), len(M[0]))
+
+def generar_colores(cantidad):
+    """Función que crea una lista de colores RGB según la cantidad de
+    colores que ocupa el autómata."""
+    colores = []
+    for i in range(cantidad):
+        r = (50 + i * 70) % 256
+        g = (200 + i * 110) % 256
+        b = (120 + i * 160) % 256
+        colores.append((r, g, b))
+    return colores
+
+
+def validar_regla(regla):
+    """Función que valida que la regla solo tenga letras L y R.
+    Retorna la regla en mayúscula."""
+    if type(regla) != str:
+        raise Exception("La regla debe ser un string.")
+    regla = regla.upper()
+    if regla == "":
+        raise Exception("La regla no puede estar vacía.")
+    for letra in regla:
+        if letra != "L" and letra != "R":
+            raise Exception("La regla solo puede tener L y R.")
+    return regla
+
+
+def guardar(nombre, datos):
+    """Función que guarda el estado completo del autómata en un archivo."""
+    archivo = open(nombre, "wb")
+    pickle.dump(datos, archivo)
+    archivo.close()
+
+
+def cargar(nombre):
+    """Función que carga el estado completo del autómata desde un archivo."""
+    archivo = open(nombre, "rb")
+    datos = pickle.load(archivo)
+    archivo.close()
+    return datos

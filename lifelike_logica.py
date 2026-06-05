@@ -1,13 +1,10 @@
 from random import randint
 import pickle
 
-def reinicio_random(filas, columnas):
-    return generar_matriz(filas, columnas)
-
-def reinicio_neutro(filas, columnas):
+def generar_matriz_vacia(filas, columnas):
     return [[0 for c in range(columnas)] for f in range(filas)]
     
-def generar_matriz(filas, columnas):
+def generar_matriz_aleatoria(filas, columnas):
     """Función que retorna una matriz de las dimensiones
     especificadas con valores enteros aleatorios de 0 o 1"""
     return [[randint(0, 1) for c in range(columnas)] for f in range(filas)]    
@@ -48,7 +45,7 @@ def transicion(M, nacimiento, supervivencia):
         fila =[]
         for c in range(len(M[0])):
             vecinos = obtener_vecinos(M, f, c)
-            estado2 = transicion_celula(M[f][c], vecinos)
+            estado2 = transicion_celula(M[f][c], vecinos, nacimiento, supervivencia)
             fila.append(estado2)
         matriz2.append(fila)
     return matriz2

@@ -18,7 +18,7 @@ def main():
     supervivencia = []
     for digito in texto:
         supervivencia.append(int(digito))
-    M = lif.generar_matriz(filas, columnas)
+    M = lif.generar_matriz_aleatoria(filas, columnas)
     w, h = columnas * tam, filas * tam
     window = pygame.display.set_mode((w, h))
     loop = True
@@ -32,9 +32,9 @@ def main():
                 if keys[pygame.K_SPACE]:
                     pausa = not pausa
                 elif keys[pygame.K_r]:
-                    M = lif.reinicio_random(filas, columnas)
+                    M = lif.generar_matriz_aleatoria(filas, columnas)
                 elif keys[pygame.K_b]:
-                    M = lif.reinicio_neutro(filas, columnas)
+                    M = lif.generar_matriz_vacia(filas, columnas)
                 elif keys[pygame.K_g]:
                     datos = {"M": M,"filas": filas,"columnas": columnas,"tam": tam,"nacimiento": nacimiento,"supervivencia": supervivencia}
                     lif.guardar("partida.dat", datos)
@@ -66,7 +66,7 @@ def main():
         if not pausa:
             M = lif.transicion(M, nacimiento, supervivencia)
         pygame.display.update()
-        clock.tick(10)
+        clock.tick(tick)
     pygame.quit()
 
 if __name__ == "__main__":

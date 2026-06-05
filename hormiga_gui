@@ -102,6 +102,114 @@ def reiniciar_vacio(filas, columnas):
     hormiga = hor.crear_hormiga(filas, columnas)
     return M, hormiga
 
+def guardar_partida(M, filas, columnas, tam, regla, hormiga):
+    """Guarda la partida actual en un archivo.
+    Entradas y restricciones:
+    - Datos actuales del automata.
+    Salida:
+    - Archivo hormiga.dat creado o actualizado.
+    """
+    datos = {"M": M, "filas": filas, "columnas": columnas, "tam": tam, "regla": regla, "hormiga": hormiga}
+    hor.guardar("hormiga.dat", datos)
+
+
+def cargar_partida():
+    """Carga la partida guardada.
+    Entradas y restricciones:
+    - Debe existir el archivo hormiga.dat.
+    Salida:
+    - Datos guardados o None si ocurre un error.
+    """
+    try:
+        return hor.cargar("hormiga.dat")
+    except Exception:
+        easygui.msgbox("No se pudo cargar el archivo hormiga.dat")
+        return None
+
+
+def procesar_mouse(event, M, filas, columnas, tam, regla):
+    """Procesa los clics del mouse sobre la matriz.
+    Entradas y restricciones:
+    - event: evento de pygame.
+    - M: matriz actual.
+    Salida:
+    - Modifica la celda seleccionada si se presiona clic izquierdo.
+    """
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        buttons = pygame.mouse.get_pressed()
+        x, y = pygame.mouse.get_pos()
+
+        if buttons[0]:
+            f = y // tam
+            c = x // tam
+            if f >= 0 and f < filas and c >= 0 and c < columnas:
+                M[f][c] = (M[f][c] + 1) % len(regla)
+
+
+def dibujar_matriz(window, M, filas, columnas, tam, colores):
+    """Dibuja la matriz del automata en la ventana.
+    Entradas y restricciones:
+    - window: ventana de pygame.
+    - M: matriz actual.
+    Salida:
+    - Matriz dibujada en pantalla.
+    """
+    for f in range(filas):
+        for c in range(columnas):
+            x = c * tam
+            y = f * tam
+            pygame.draw.rect(window, colores[M[f][c]], (x, y, tam, tam))
+
+
+def dibujar_hormiga(window, hormiga, tam):
+    """Dibuja la hormiga sobre la matriz.
+    Entradas y restricciones:
+    - hormiga: diccionario con fila y columna.
+    Salida:
+    - Hormiga dibujada en pantalla.
+    """
+    x = hormiga["c"] * tam
+    y = hormiga["f"] * tam
+    pygame.draw.rect(window, (255, 255, 255), (x, y, tam, tam))
+
+
+def procesar_tecla(event, M, filas, columnas, tam, regla, hormiga, pausa, window):
+    """Procesa las teclas usadas por el automata.
+    Entradas y restricciones:
+    - event: evento de pygame.
+    - Datos actuales del automata.
+    Salida:
+    - Datos actualizados del automata.
+    """
+    if event.type == pygame.KEYDOWN:
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_SPACE]:
+            pausa = not pausa
+
+        elif keys[pygame.K_r]:
+            M, hormiga = reiniciar_aleatorio(filas, columnas, regla)
+
+        elif keys[pygame.K_b]:
+            M, hormiga = reiniciar_vacio(filas, columnas)
+
+        elif keys[pygame.K_g]:
+            guardar_partida(M, filas, columnas, tam, regla, hormiga)
+
+        elif keys[pygame.K_c]:
+            datos = cargar_partida()
+            if datos != None:
+                M = datos["M"]
+                filas = datos["filas"]
+                columnas = datos["columnas"]
+                tam = datos["tam"]
+                regla = datos["regla"]
+                hormiga = datos["hormiga"]
+                window = crear_ventana(filas, columnas, tam)
+
+    colores = hor.generar_colores(len(regla))
+    return M, filas, columnas, tam, regla, hormiga, pausa, window, colores
+
 
         pygame.display.update()
         clock.tick(tick)

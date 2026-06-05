@@ -25,6 +25,38 @@ def pedir_entero(mensaje):
             except Exception:
                 easygui.msgbox("Debe ingresar un número entero válido.")
 
+def pedir_regla():
+    """Solicita la regla de la hormiga usando easygui.
+    Entradas y restricciones:
+    - La regla solo puede contener L y R.
+    Salida:
+    - Regla válida en mayúscula.
+    """
+    while True:
+        regla = easygui.enterbox("Regla de la hormiga usando L y R. Ejemplos: LR, RLR, LLRR")
+
+        try:
+            return hor.validar_regla(regla)
+        except Exception as e:
+            easygui.msgbox("ERROR: " + str(e))
+
+def pedir_parametros():
+    """Solicita todos los parámetros iniciales del automáta.
+    Entradas y restricciones:
+    - Filas, columnas y tamano deben ser enteros positivos.
+    - La regla solo puede contener L y R.
+    Salida:
+    - Filas, columnas, tamano y regla.
+    """
+    filas = pedir_entero("Cantidad de filas")
+    columnas = pedir_entero("Cantidad de columnas")
+    tam = pedir_entero("Tamaño de las celdas")
+    regla = pedir_regla()
+    return filas, columnas, tam, regla
+
+
+
+
         pygame.display.update()
         clock.tick(tick)
 

@@ -1,0 +1,20 @@
+from random import randint
+import pickle
+
+def generar_matriz_vacia(filas, columnas):
+    """Función que retorna una matriz de las dimensiones
+    especificadas con valores en cero."""
+    return [[0 for c in range(columnas)] for f in range(filas)]
+
+
+def generar_matriz_aleatoria(filas, columnas, colores):
+    """Función que retorna una matriz de las dimensiones
+    especificadas con valores enteros aleatorios entre 0 y colores - 1."""
+    return [[randint(0, colores - 1) for c in range(columnas)] for f in range(filas)]
+
+
+def crear_hormiga(filas, columnas):
+    """Función que crea la hormiga en el centro de la matriz.
+    La dirección se guarda así:
+    0 arriba, 1 derecha, 2 abajo, 3 izquierda."""
+    return {"f": filas // 2, "c": columnas // 2, "direccion": 0}

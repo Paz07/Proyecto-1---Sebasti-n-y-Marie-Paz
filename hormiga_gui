@@ -79,6 +79,29 @@ def crear_datos_iniciales(filas, columnas, regla):
     colores = hor.generar_colores(len(regla))
     return M, hormiga, colores
 
+def reiniciar_aleatorio(filas, columnas, regla):
+    """Reinicia el automata con una matriz aleatoria.
+    Entradas y restricciones:
+    - filas, columnas y regla actual.
+    Salida:
+    - Nueva matriz y nueva hormiga.
+    """
+    M = hor.generar_matriz_aleatoria(filas, columnas, len(regla))
+    hormiga = hor.crear_hormiga(filas, columnas)
+    return M, hormiga
+
+
+def reiniciar_vacio(filas, columnas):
+    """Reinicia el automata con una matriz vacía.
+    Entradas y restricciones:
+    - filas y columnas actuales.
+    Salida:
+    - Nueva matriz y nueva hormiga.
+    """
+    M = hor.generar_matriz_vacia(filas, columnas)
+    hormiga = hor.crear_hormiga(filas, columnas)
+    return M, hormiga
+
 
         pygame.display.update()
         clock.tick(tick)

@@ -226,9 +226,7 @@ def main():
             if event.type == pygame.QUIT:
                 loop = False
 
-            M, filas, columnas, tam, regla, hormiga, pausa, window, colores = procesar_tecla(
-                event, M, filas, columnas, tam, regla, hormiga, pausa, window)
-
+            M, filas, columnas, tam, regla, hormiga, pausa, window, colores = procesar_tecla(event, M, filas, columnas, tam, regla, hormiga, pausa, window)
             procesar_mouse(event, M, filas, columnas, tam, regla)
 
         window.fill((0, 0, 0))

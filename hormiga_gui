@@ -206,11 +206,37 @@ def procesar_tecla(event, M, filas, columnas, tam, regla, hormiga, pausa, window
                 regla = datos["regla"]
                 hormiga = datos["hormiga"]
                 window = crear_ventana(filas, columnas, tam)
-
     colores = hor.generar_colores(len(regla))
     return M, filas, columnas, tam, regla, hormiga, pausa, window, colores
 
+def main():
+    """Programa principal de la hormiga de Langton generalizada."""
+    pygame.init()
+    clock = pygame.time.Clock()
 
+    filas, columnas, tam, regla = pedir_parametros()
+    M, hormiga, colores = crear_datos_iniciales(filas, columnas, regla)
+    window = crear_ventana(filas, columnas, tam)
+
+    loop = True
+    pausa = False
+
+    while loop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+
+            M, filas, columnas, tam, regla, hormiga, pausa, window, colores = procesar_tecla(
+                event, M, filas, columnas, tam, regla, hormiga, pausa, window)
+
+            procesar_mouse(event, M, filas, columnas, tam, regla)
+
+        window.fill((0, 0, 0))
+        dibujar_matriz(window, M, filas, columnas, tam, colores)
+        dibujar_hormiga(window, hormiga, tam)
+
+        if not pausa:
+            hor.siguiente(M, hormiga, regla)
         pygame.display.update()
         clock.tick(tick)
 

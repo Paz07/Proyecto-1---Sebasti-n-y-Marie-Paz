@@ -54,7 +54,30 @@ def pedir_parametros():
     regla = pedir_regla()
     return filas, columnas, tam, regla
 
+def crear_ventana(filas, columnas, tam):
+    """Crea la ventana de pygame segun las dimensiones de la matriz.
+    Entradas y restricciones:
+    - filas, columnas y tamañoo son enteros positivos.
+    Salida:
+    - Ventana de pygame.
+    """
+    w = columnas * tam
+    h = filas * tam
+    return pygame.display.set_mode((w, h))
 
+
+def crear_datos_iniciales(filas, columnas, regla):
+    """Crea la matriz, la hormiga y los colores iniciales.
+    Entradas y restricciones:
+    - filas y columnas: enteros positivos.
+    - regla: string validado.
+    Salida:
+    - Matriz, hormiga y colores.
+    """
+    M = hor.generar_matriz_vacia(filas, columnas)
+    hormiga = hor.crear_hormiga(filas, columnas)
+    colores = hor.generar_colores(len(regla))
+    return M, hormiga, colores
 
 
         pygame.display.update()

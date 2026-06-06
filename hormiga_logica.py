@@ -1,0 +1,96 @@
+from random import randint
+import pickle
+
+def generar_matriz_vacia(filas, columnas):
+    """Función que retorna una matriz de las dimensiones
+    especificadas con valores en cero."""
+    return [[0 for c in range(columnas)] for f in range(filas)]
+
+
+def generar_matriz_aleatoria(filas, columnas, colores):
+    """Función que retorna una matriz de las dimensiones
+    especificadas con valores enteros aleatorios entre 0 y colores - 1."""
+    return [[randint(0, colores - 1) for c in range(columnas)] for f in range(filas)]
+
+
+def crear_hormiga(filas, columnas):
+    """Función que crea la hormiga en el centro de la matriz.
+    La dirección se guarda así:
+    0 arriba, 1 derecha, 2 abajo, 3 izquierda."""
+    return {"f": filas // 2, "c": columnas // 2, "direccion": 0}
+
+def girar_hormiga(direccion, giro):
+    """Función que cambia la dirección de la hormiga según el giro.
+    Si el giro es L gira a la izquierda y si es R gira a la derecha."""
+    if giro == "L":
+        return (direccion - 1) % 4
+    if giro == "R":
+        return (direccion + 1) % 4
+    raise Exception("La regla solo puede tener L y R.")
+
+
+def avanzar_hormiga(hormiga, filas, columnas):
+    """Función que actualiza la posición de la hormiga según su dirección.
+    La matriz se trabaja de forma toroidal."""
+    if hormiga["direccion"] == 0:
+        hormiga["f"] = (hormiga["f"] - 1) % filas
+    elif hormiga["direccion"] == 1:
+        hormiga["c"] = (hormiga["c"] + 1) % columnas
+    elif hormiga["direccion"] == 2:
+        hormiga["f"] = (hormiga["f"] + 1) % filas
+    elif hormiga["direccion"] == 3:
+        hormiga["c"] = (hormiga["c"] - 1) % columnas
+
+def siguiente(M, hormiga, regla):
+    """Función que aplica una transición de la hormiga.
+    Busca el color de la celda actual, gira la hormiga según la regla,
+    cambia la celda al siguiente color y mueve la hormiga un espacio."""
+    f = hormiga["f"]
+    c = hormiga["c"]
+
+    color = M[f][c]
+    giro = regla[color]
+
+    hormiga["direccion"] = girar_hormiga(hormiga["direccion"], giro)
+    M[f][c] = (M[f][c] + 1) % len(regla)
+    avanzar_hormiga(hormiga, len(M), len(M[0]))
+
+def generar_colores(cantidad):
+    """Función que crea una lista de colores RGB según la cantidad de
+    colores que ocupa el autómata."""
+    colores = []
+    for i in range(cantidad):
+        r = (50 + i * 70) % 256
+        g = (200 + i * 110) % 256
+        b = (120 + i * 160) % 256
+        colores.append((r, g, b))
+    return colores
+
+
+def validar_regla(regla):
+    """Función que valida que la regla solo tenga letras L y R.
+    Retorna la regla en mayúscula."""
+    if type(regla) != str:
+        raise Exception("La regla debe ser un string.")
+    regla = regla.upper()
+    if regla == "":
+        raise Exception("La regla no puede estar vacía.")
+    for letra in regla:
+        if letra != "L" and letra != "R":
+            raise Exception("La regla solo puede tener L y R.")
+    return regla
+
+
+def guardar(nombre, datos):
+    """Función que guarda el estado completo del autómata en un archivo."""
+    archivo = open(nombre, "wb")
+    pickle.dump(datos, archivo)
+    archivo.close()
+
+
+def cargar(nombre):
+    """Función que carga el estado completo del autómata desde un archivo."""
+    archivo = open(nombre, "rb")
+    datos = pickle.load(archivo)
+    archivo.close()
+    return datos

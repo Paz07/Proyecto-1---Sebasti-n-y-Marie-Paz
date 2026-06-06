@@ -1,0 +1,250 @@
+import pygame
+import hormiga_logica as hor
+import easygui
+
+tick = 60
+
+def es_entero_positivo(en):
+    """Función que valida que sea un entero positivo.
+    Entradas y restricciones:
+    - r: respuesta que sea numero  entero positivo para columnas,
+    filas, y tamaño de celdas
+    Salidas:
+    Un entero positivo"""
+    while True:
+        texto = easygui.enterbox(en)
+
+        if texto == None:
+            easygui.msgbox("Debe ingresar un número.")
+        else:
+            try:
+                numero = int(texto)
+                if numero > 0:
+                    return numero
+                easygui.msgbox("Debe ingresar un número mayor que cero.")
+            except Exception:
+                easygui.msgbox("Debe ingresar un número entero válido.")
+            except ValueError:
+                easygui.msgbox("Solo se permiten números enteros positivos.")
+
+def pedir_regla():
+    """Solicita la regla de la hormiga usando easygui.
+    Entradas y restricciones:
+    - La regla solo puede contener L y R.
+    Salida:
+    - Regla válida en mayúscula.
+    """
+    while True:
+        regla = easygui.enterbox("Regla de la hormiga usando L y R. Ejemplos: LR, RLR, LLRR")
+
+        try:
+            return hor.validar_regla(regla)
+        except Exception as e:
+            easygui.msgbox("ERROR: " + str(e))
+
+def pedir_parametros():
+    """Solicita todos los parámetros iniciales del automáta.
+    Entradas y restricciones:
+    - Filas, columnas y tamano deben ser enteros positivos.
+    - La regla solo puede contener L y R.
+    Salida:
+    - Filas, columnas, tamano y regla.
+    """
+    filas = es_entero_positivo("Cantidad de filas")
+    columnas = es_entero_positivo("Cantidad de columnas")
+    tam = es_entero_positivo("Tamaño de las celdas")
+    regla = pedir_regla()
+    return filas, columnas, tam, regla
+
+def crear_ventana(filas, columnas, tam):
+    """Crea la ventana de pygame segun las dimensiones de la matriz.
+    Entradas y restricciones:
+    - filas, columnas y tamañoo son enteros positivos.
+    Salida:
+    - Ventana de pygame.
+    """
+    w = columnas * tam
+    h = filas * tam
+    return pygame.display.set_mode((w, h))
+
+
+def crear_datos_iniciales(filas, columnas, regla):
+    """Crea la matriz, la hormiga y los colores iniciales.
+    Entradas y restricciones:
+    - filas y columnas: enteros positivos.
+    - regla: string validado.
+    Salida:
+    - Matriz, hormiga y colores.
+    """
+    M = hor.generar_matriz_vacia(filas, columnas)
+    hormiga = hor.crear_hormiga(filas, columnas)
+    colores = hor.generar_colores(len(regla))
+    return M, hormiga, colores
+
+def reiniciar_aleatorio(filas, columnas, regla):
+    """Reinicia el automata con una matriz aleatoria.
+    Entradas y restricciones:
+    - filas, columnas y regla actual.
+    Salida:
+    - Nueva matriz y nueva hormiga.
+    """
+    M = hor.generar_matriz_aleatoria(filas, columnas, len(regla))
+    hormiga = hor.crear_hormiga(filas, columnas)
+    return M, hormiga
+
+
+def reiniciar_vacio(filas, columnas):
+    """Reinicia el automata con una matriz vacía.
+    Entradas y restricciones:
+    - filas y columnas actuales.
+    Salida:
+    - Nueva matriz y nueva hormiga.
+    """
+    M = hor.generar_matriz_vacia(filas, columnas)
+    hormiga = hor.crear_hormiga(filas, columnas)
+    return M, hormiga
+
+def guardar_partida(M, filas, columnas, tam, regla, hormiga):
+    """Guarda la partida actual en un archivo.
+    Entradas y restricciones:
+    - Datos actuales del automata.
+    Salida:
+    - Archivo hormiga.dat creado o actualizado.
+    """
+    datos = {"M": M, "filas": filas, "columnas": columnas, "tam": tam, "regla": regla, "hormiga": hormiga}
+    hor.guardar("hormiga.dat", datos)
+
+
+def cargar_partida():
+    """Carga la partida guardada.
+    Entradas y restricciones:
+    - Debe existir el archivo hormiga.dat.
+    Salida:
+    - Datos guardados o None si ocurre un error.
+    """
+    try:
+        return hor.cargar("hormiga.dat")
+    except Exception:
+        easygui.msgbox("No se pudo cargar el archivo hormiga.dat")
+        return None
+
+
+def procesar_mouse(event, M, filas, columnas, tam, regla):
+    """Procesa los clics del mouse sobre la matriz.
+    Entradas y restricciones:
+    - event: evento de pygame.
+    - M: matriz actual.
+    Salida:
+    - Modifica la celda seleccionada si se presiona clic izquierdo.
+    """
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        buttons = pygame.mouse.get_pressed()
+        x, y = pygame.mouse.get_pos()
+
+        if buttons[0]:
+            f = y // tam
+            c = x // tam
+            if f >= 0 and f < filas and c >= 0 and c < columnas:
+                M[f][c] = (M[f][c] + 1) % len(regla)
+
+
+def dibujar_matriz(window, M, filas, columnas, tam, colores):
+    """Dibuja la matriz del automata en la ventana.
+    Entradas y restricciones:
+    - window: ventana de pygame.
+    - M: matriz actual.
+    Salida:
+    - Matriz dibujada en pantalla.
+    """
+    for f in range(filas):
+        for c in range(columnas):
+            x = c * tam
+            y = f * tam
+            pygame.draw.rect(window, colores[M[f][c]], (x, y, tam, tam))
+
+
+def dibujar_hormiga(window, hormiga, tam):
+    """Dibuja la hormiga sobre la matriz.
+    Entradas y restricciones:
+    - hormiga: diccionario con fila y columna.
+    Salida:
+    - Hormiga dibujada en pantalla.
+    """
+    x = hormiga["c"] * tam
+    y = hormiga["f"] * tam
+    pygame.draw.rect(window, (255, 255, 255), (x, y, tam, tam))
+
+
+def procesar_tecla(event, M, filas, columnas, tam, regla, hormiga, pausa, window):
+    """Procesa las teclas usadas por el automata.
+    Entradas y restricciones:
+    - event: evento de pygame.
+    - Datos actuales del automata.
+    Salida:
+    - Datos actualizados del automata.
+    """
+    if event.type == pygame.KEYDOWN:
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_SPACE]:
+            pausa = not pausa
+
+        elif keys[pygame.K_r]:
+            M, hormiga = reiniciar_aleatorio(filas, columnas, regla)
+
+        elif keys[pygame.K_b]:
+            M, hormiga = reiniciar_vacio(filas, columnas)
+
+        elif keys[pygame.K_g]:
+            guardar_partida(M, filas, columnas, tam, regla, hormiga)
+
+        elif keys[pygame.K_c]:
+            datos = cargar_partida()
+            if datos != None:
+                M = datos["M"]
+                filas = datos["filas"]
+                columnas = datos["columnas"]
+                tam = datos["tam"]
+                regla = datos["regla"]
+                hormiga = datos["hormiga"]
+                window = crear_ventana(filas, columnas, tam)
+    colores = hor.generar_colores(len(regla))
+    return M, filas, columnas, tam, regla, hormiga, pausa, window, colores
+
+def main():
+    """Programa principal de la hormiga de Langton generalizada."""
+    pygame.init()
+    clock = pygame.time.Clock()
+
+    filas, columnas, tam, regla = pedir_parametros()
+    M, hormiga, colores = crear_datos_iniciales(filas, columnas, regla)
+    window = crear_ventana(filas, columnas, tam)
+
+    loop = True
+    pausa = False
+
+    while loop:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                loop = False
+
+            M, filas, columnas, tam, regla, hormiga, pausa, window, colores = procesar_tecla(
+                event, M, filas, columnas, tam, regla, hormiga, pausa, window)
+
+            procesar_mouse(event, M, filas, columnas, tam, regla)
+
+        window.fill((0, 0, 0))
+        dibujar_matriz(window, M, filas, columnas, tam, colores)
+        dibujar_hormiga(window, hormiga, tam)
+
+        if not pausa:
+            hor.siguiente(M, hormiga, regla)
+        pygame.display.update()
+        clock.tick(tick)
+
+    pygame.quit()
+
+
+
+if __name__ == "__main__":
+    main()

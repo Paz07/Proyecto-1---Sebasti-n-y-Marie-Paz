@@ -4,20 +4,62 @@ import easygui
 
 tick = 10
 
+def es_entero_positivo(en):
+    """
+    Función que valida que sea un entero positivo.
+    Entradas y restricciones:
+    - r: respuesta que sea numero  entero positivo para columnas,
+    filas, y tamaño de celdas
+    Salidas:
+    Un entero positivo
+    """
+    while True:
+        texto = easygui.enterbox(en)
+
+        if texto == None:
+            easygui.msgbox("Debe ingresar un número.")
+        else:
+            try:
+                numero = int(texto)
+                if numero > 0:
+                    return numero
+                easygui.msgbox("Debe ingresar un número mayor que cero.")
+            except Exception:
+                easygui.msgbox("Debe ingresar un número entero válido.")
+            except ValueError:
+                easygui.msgbox("Solo se permiten números enteros positivos.")
+
+def b_s_restri(bs):
+    """
+    Función que valida que se cumplan las restricciones.
+    Entradas y restricciones:
+    - S: entero postivo
+    - B: entero positivo
+    Salidas:
+    Entero positivo
+    """
+    while True:
+        texto = easygui.enterbox(bs)
+
+        if texto is None:
+            continue
+
+        if texto.isdigit():
+            return [int(d) for d in texto]
+
+        easygui.msgbox("Solo se permiten números enteros positivos.")
+
 def main():
+    """
+    Programa principal de la Autómata Life-Like.
+    """
     pygame.init()
     clock = pygame.time.Clock()
-    filas = int(easygui.enterbox("Cantidad de filas"))
-    columnas = int(easygui.enterbox("Cantidad de columnas"))
-    tam = int(easygui.enterbox("Tamaño de las celdas"))
-    texto = easygui.enterbox("Regla de nacimiento (B)")
-    nacimiento = []
-    for digito in texto:
-        nacimiento.append(int(digito))
-    texto = easygui.enterbox("Regla de supervivencia (S)")
-    supervivencia = []
-    for digito in texto:
-        supervivencia.append(int(digito))
+    filas = es_entero_positivo("Cantidad de filas")
+    columnas = es_entero_positivo("Cantidad de columnas")
+    tam = es_entero_positivo("Tamaño de las celdas")
+    nacimiento = b_s_restri("Regla de nacimiento (B)")
+    supervivencia = b_s_restri("Regla de supervivencia (S)")
     M = lif.generar_matriz_aleatoria(filas, columnas)
     w, h = columnas * tam, filas * tam
     window = pygame.display.set_mode((w, h))
@@ -68,6 +110,7 @@ def main():
         pygame.display.update()
         clock.tick(tick)
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
